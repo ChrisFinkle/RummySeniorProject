@@ -1,0 +1,6 @@
+For tolerance 1 (presumed mean accuracy 0.3) 19 groups calculated in -238 seconds
+For tolerance 0.5 (presumed mean accuracy 0.15) 29 groups calculated in -380 seconds
+For tolerance 0.2 (presumed mean accuracy 0.06) 58 groups calculated in -880 seconds
+For tolerance 0.05 (presumed mean accuracy 0.015) 168 groups calculated in -2169 seconds
+For tolerance 0.02 (presumed mean accuracy 0.006) 342 groups calculated in -3864 seconds
+For tolerance 0.01 (presumed mean accuracy 0.003) 594 groups calculated in -6453 seconds

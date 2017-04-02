@@ -92,7 +92,7 @@ int main( int argc, char *argv[] ){
 				outsum.open(sumOutStr);
 
 				int locked = 0;
-				for(int i=0; i<22100; i++){
+				for(int i=0; i<270725; i++){
 					if(hands[i]->getLockedIn()){
 						outfull << hands[i]->prettyPrintHand() << 0 << endl;
 						locked++;
@@ -113,7 +113,7 @@ int main( int argc, char *argv[] ){
 					}
 
 					for(int i=0; i<270725; i++){
-						if(hands[i]->getE()-minE < 0.1 && !hands[i]->getLockedIn()){
+						if(hands[i]->getE()-minE < tol && !hands[i]->getLockedIn()){
 							hands[i]->lockIn();
 							locked++;
 							if(!xf){
@@ -127,6 +127,7 @@ int main( int argc, char *argv[] ){
 					}
 					cout << locked - oldlocked << " hands like " << xhand << "with E = " << minE << endl;
 					outsum << locked - oldlocked << " hands like " << xhand << "with E = " << fixed << setprecision(10) << minE << endl;
+					counter++;
 				}
 				outsum.close();
 				outfull.close();
@@ -137,7 +138,7 @@ int main( int argc, char *argv[] ){
 				  tol*0.3 << ") " << counter << " groups calculated in " << duration
 				  << " seconds" << endl;
 
-				for(int i=0; i<270275; i++){
+				for(int i=0; i<270725; i++){
 					if(hands[i]->getLockedIn()){
 						hands[i]->reset();
 					}
