@@ -1,0 +1,13 @@
+96 hands like AC AD AH with E = 0.0000000000
+240 hands like 2C 2D 3C with E = 12.2500000000
+216 hands like AC 3C 3D with E = 14.2916666667
+1752 hands like AC AD 3C with E = 14.8750000000
+2184 hands like AC AD 2C with E = 15.4731867284
+420 hands like AC 3C 5C with E = 15.9763986014
+120 hands like AC 2D 2H with E = 16.3252494553
+1484 hands like AC AD 3H with E = 17.0145782073
+672 hands like AC AD 2H with E = 17.2325884407
+696 hands like AC 2C 4D with E = 17.6765799652
+6972 hands like AC 2C 3D with E = 18.1432355981
+6424 hands like AC 2D 3H with E = 18.4305322314
+824 hands like AC 2D 5D with E = 18.8536850047
