@@ -15,7 +15,7 @@
 \usepackage{graphicx}
 \usepackage{setspace}
 \usepackage{amsthm}
-
+\graphicspath{ {images/} }
 \renewcommand\qedsymbol{$\blacksquare$}
 
 % --------------------------------------------------------------------
@@ -303,6 +303,8 @@ This information is more than a curiosity, since it is also the upper bound on s
 
 While the complete description of all 688 equivalence classes, much less all 22,100 hands, is too cumbersome for inclusion in this paper, we can summarize the results graphically. Figure 1 plots $E$ against the cumulative number of hands calculated.
 
+\includegraphics[width=\textwidth]{fig1.png}
+
 We can make some qualitative observations based on this graph. The expected time increases rapidly for the first few iterations, then levels off with values slightly greater than 15 for more than 4,000 hands. We might think of these as ‘good’ hands, while all the ones that come after might be thought of as ‘bad’ hands. Such subjective simplifications are mere heuristics for now, but they may come in handy as we seek ways to simplify our understanding of larger and more complex games. 
 
 \subsection{Analysis of Results for 3-Card Rummy with Aces High or Low}
@@ -325,6 +327,8 @@ Unlike before, it is the set of hands solved by not the 12th but the 4th iterati
 
 With such radical changes from our other two rule sets apparent in these metrics, we might question whether the overall contour of the accumulation curve will be radically different as well. The answer is: not quite. As seen in Figure 2, the curve for this wrap-around rule set is chunkier, lower, and slower than the curves for the other two rule sets, but it follows a similar path overall. There is still the same sudden jump from ‘good’ hands to ‘bad’, though this one occurs more than 6,000 hands deep rather than 5,000 hands. This jump is also more precipitous: there are  actually no hands whatsoever whose $E$ begin with 16 under Continuity rules (one class has $E \approx 15.98$, the next has $E \approx 17.01$). But as we can see on the graph, it is qualitatively speaking a very similar jump. 
 
+\includegraphics[width=\textwidth]{fig2.png}
+
 What can we learn from this surprising similarity? It is apparent that the most important factor in the value of E for most hands is the relative position and suit of the cards to each other, with absolute end effects only interfering partially with these more powerful forces.  This near-congruence bodes well for our future efforts to simplify larger Rummy games. The Continuity rummy’s dynamic program took only a half hour to run, a tiny fraction of the time required for the other two rule sets. If the most influential factor on policy ought to be the relative values and suits of cards, the construction of our policy function may be simplified immensely.
 
 It is here that we pause and note that the output of our program, in aggregate, forms the basis for the hugely complex discrete policy function for these three rule sets describing games of 3-card rummy. It serves as a dictionary for evaluating $\min_{a\in \Gamma_x(h)}\{T_x(h,a)\}$ in all situations, thus finding what is expected to be the objective best move. While it will not guarantee a win in all situations, this counts as optimal play; for any hand $h_0$, E will be reduced from $E(h_0)$ to 0 as quickly as possible under the circumstances. 3-card Rummy is solved. 
@@ -339,13 +343,20 @@ There are fewer Rummies in the 4-card game, as well. This is due to the lost fle
 
 \section{Analysis of Results for 4-Card Continuity Rummy}
 
-Due to the high symmetry of Continuity Rummy, it was possible to run the calculation at full precision in a reasonable time frame. The resulting output featured 654 equivalence classes as compared to 3-Card Continuity's mere 60. The ratio $\frac{654}{60} \approx \frac{270725}{22100}$, indicating that the number of equivalence classes may grow roughly in proportion with the number of hands. We may conjecture that 7-card Continuity Rummy would have roughly $\frac{\binom{52}{7}}{270725} * 654 \approx 300,000$ such classes - a dispiriting estimate to be sure. Our approach, while the most rigorous available, may not be readily applicable to games larger than 4-card Rummy.
-
-While we are applying it, however, we find that there are 2496 'best' hands with $E=24$ as mentioned above, slightly less than 1$\%$ of the total. The worst hands are these:
+Due to the high symmetry of Continuity Rummy, it was possible to run the calculation at full precision in a reasonable time frame. We find that there are 2496 'best' hands with $E=24$ as mentioned above, slightly less than 1$\%$ of the total. The worst hands are these:
 
 $$\texttt{156 hands like A$\clubsuit$ 2$\diamondsuit$ 5$\clubsuit$ 6$\diamondsuit$ with E = 38.6563243418}$$
 
 Figure 3 illustrates the complete summary of the results. The strictures of 4-Card Rummy are unforgiving. Games would be expected to last much, much longer than 3-Card rummy because it is much more difficult to arrange all four required cards. This indicates that in the games of 7-card and 10-card Rummy, it would be the acquisition of a 4-card meld which would be the bottleneck.
+
+\begin{figure}
+\includegraphics[width=\textwidth]{fig3.png}
+\caption{4-card Wrap}\label{fig:3}
+\end{figure}
+
+The resulting output featured 654 equivalence classes as compared to 3-Card Continuity's mere 60. The ratio $\frac{654}{60} \approx \frac{270725}{22100}$, indicating that the number of equivalence classes may grow roughly in proportion with the number of hands. We may conjecture that 7-card Continuity Rummy would have roughly $\frac{\binom{52}{7}}{270725} * 654 \approx 300,000$ such classes - a dispiriting estimate to be sure. Our approach, while the most rigorous available, may not be readily applicable to games larger than 4-card Rummy. In fact, even 4-Card Rummy with Aces low invites difficulties of scale, as we may conjecture that it will require a similarly greater number of equivalence classes to fully describe. For 3-Card Rummy the ratio from Wrap to Aces Low was 60:688. If the results for 4-Card are similar we will have $\frac{654}{60} * 688 \approx 7000$ classes on our hands - hardly a summary at all.
+
+While our interest began with optimization, it has become clear that the scale of the problem is such that finding the true optimal solution may not always be efficient, and that the marginal utility of such aggressive optimization may not be worth the computational effort. Let us now consider methods for finding satisficing strategies - those which are good, but not necessarily perfect.
 
 \chapter{Approximation and Least Upper Bounds}
 
@@ -355,7 +366,7 @@ Consider a hand $h$ of 3 non-adjacent cards arranged to have the minimum possibl
 
 In order to place an upper bound on $E$ for all hands in $H$, we may use the expected value results achieved in Theorem 1.2 to determine how long it will take to produce a hand with a valid pair, and then once a pair is established how long it will take to complete it. Because there are a total of 11 cards which will give us a pair, we expect it to take $\frac{49}{11}$ turns to create a pair. Once a pair is achieved, we expect it to take $\frac{49}{2}$ turns to complete it. As such, we expect that an upper bound for all hands in 3-card Rummy is around 29 turns.
 
-As it turns out, this is a very bad upper bound. The true least upper bound, as mentioned in section 3.1.1, is around 19.18. But the general strategy here is sound - if we establish how long it takes to get to a known class of better hand, we can derive an upper bound from the time it takes to reach to that class of hand and that class' own $E$.
+As it turns out, this is a very bad upper bound. The true least upper bound, as mentioned in section 3.1.1, is around 19.18. But the general strategy here is sound - if we establish how long it takes to get to a known class of better hand, we can derive an upper bound from the time it takes to reach to that class of hand and that class' own $E$. In essence, we are generating an approximation by choosing a strategy which is willfully obtuse, intentionally ignoring potential improvements in exchange for increased simplicity.
 
 How can we refine the strategy? Well, for starters, we need not rely on getting to just one class of hand. For the hand above there are two cards which lead to two-card runs which are single-ended (these being 2$\clubsuit$ and Q$\heartsuit$). Because we are playing with aces low rules, these each have only one card which can complete them, which gives them an $E$ of 49 in our naive current scheme. But how are we to integrate this with the other cards that have different, better future values for $E$? As it happens, we already have a tool for such calculation: the Bellman Sum.
 
@@ -416,7 +427,58 @@ What is the practical use of this approximation scheme? Well, since the errors a
  
 \section{Approximation of 3-Card Rummy with Aces Low}
 
-In order to test the validity of this approximation scheme, it was applied to the already-solved problem of 3-Card Rummy. 
+In order to test the validity of this approximation scheme, it was applied to the already-solved problem of 3-Card Rummy. Even seemingly large tolerances result in surprisingly accurate results. Figure 4 shows the actual $E$ arranged in ascending order for Ace Low (the blue line) along with the approximations achieved by iterating with a tolerance of 1.0.
+
+\includegraphics[width=\textwidth]{fig4.png}
+
+With smaller tolerances, the deviations become even more minute, to the extent that they can barely be seen on a full graph. Figure 5 plots the error for each hand instead with a tolerance of 0.5, and figure 6 shows a few more. In every case tested, the maximum error is significantly less than the tolerance itself. For $t=1$ the greatest error was with hands like $3\clubsuit 5\clubsuit \textrm{K}\clubsuit$; their upper bound came out 0.6109 turns higher than their true $E$. It is not easy to form an intuition for why this type hand should be less accurate than all the others. With $t=1$ the hands had a mean error of only 0.086. When $t=0.1$ the mean error is 0.019. Finally, when $t=10^{-3}$, the maximum error is $2.35*10^{-4}$ and the mean is smaller still, $1.87 * 10^{-5}$. This consistent relationship, with tolerance greater than maximum greater than mean, is displayed for every tolerance tested - about a dozen in all. The empirical evidence is ample that our scheme works and produces predictably highly accurate results.
+
+\includegraphics[width=\textwidth]{fig5.png}
+
+\includegraphics[width=\textwidth]{fig6.png}
+
+Since the motivation for this approximation was to increase the speed of our calculation, the next relevant question to pursue is the trade-off between accuracy and speed. Can we establish a relationship between tolerance and the time required to complete the calculation? In order to test this notion, we collected the duration of the calculation for 17 different $t$ values between 0.001 and 1. The results displayed a clear exponential nature. By performing a log transformation on the data we were able to obtain the following relationship via a standard linear regression:
+
+$$time = \alpha * t^{-0.538}$$
+
+where $\alpha$ is a proportionality constant depending upon the speed of the hardware. On the machine used to conduct the calculations, we had $\alpha = 7$. Figure 7 represents these data and the linear regression deduced from them.
+
+\smallskip
+\includegraphics[width=\textwidth]{fig7.png}
+
+We may use this relationship to estimate how long it will take to execute the calculation of 4-Card rummy for various tolerances, so that we can decide which are feasible and useful.
+
+\section{Approximation of 4-Card Rummy with Aces Low}
+
+To start off, let us perform the 4-Card approximation with a tolerance of 1, the largest viable value. The results are represented as points in figure 8.
+
+\smallskip
+\includegraphics[width=\textwidth]{fig8.png}
+
+This approximation is much more riotous than the 3-Card data plotted in Figure 4, with fuzzy clumps of values all along the apparent curve. The 270,672 non-Rummy hands were finalized in 19 cohorts, many of which can be seen qualitatively on the graph. (Compare this with the 7 cohorts of 3-Card Rummy with tolerance 1). The longest rectangle, fourth from the right, corresponds with the following program output:
+$$\texttt{67468 hands like A$\clubsuit$ A$\diamondsuit$ 3$\clubsuit$ 3$\diamondsuit$ with E = 39.6312457202}$$
+
+The program outputs as representative the minimum $E$ of the entire cohort, so for the 67,468 hands which were locked in on that iteration, $\min\{E_{hyp}^*\}$ was 39.6312457. 
+
+This program ran in 225 seconds. Extrapolating from our model above, we would expect a tolerance of 0.001 to take at least $225 * 0.001^{-0.538} = 9250$ seconds. This seems feasible. First, however, let's try a few more large tolerances. Figure \ref{fig:9} shows the data in the order it was finalized for three more tolerances. We can see how it appears to converge towards a central curve. At this point a note on the appearance of the data is in order: When dealing with the 3-Card approximations, we could arrange the approximated data according to the correct ordering of the hands, since we already knew the true $E$ for each hand. Since we have not solved 4-Card rummy completely, such ordering cannot be achieved when displaying our approximations, resulting in the chaotic graphs, since within each cohort the points are arranged left-to-right in 'card order' (i.e. the order in which they were constructed by the triple loop), rather than in any coherent scheme.
+
+\begin{figure}
+\includegraphics[width=\textwidth]{fig9.png}
+\caption{Estimated E for 4-Card Rummy with Various Tolerances}\label{fig:9}
+\end{figure}
+
+In the end, we did run the 4-Card approximation with $t=0.001$. The results of this calculation are presented in Figure \ref{fig:10}. We may conclude that the true contours of the hand space for 4-Card Rummy deviate from this line by less than 0.001 turns for all hands. The calculation of these data was not as easy as the exponential model would lead us to expect, however - it took 27,108 seconds, or nearly 8 hours. Indeed, another regression based on 7 data points for 4-card Rummy indicates that the correct model for this more difficult approximation is
+
+$$time = \beta * t^{-0.710}$$
+
+with $\beta = 225$ in this case. In the previous model, the time required to calculate 3-Card Ace Low with full precision was approximately 1980 seconds, a time value which corresponds with the tolerance value $2.77*10^{-5}$. (Interestingly, the smallest difference between equivalence classes for this hand is around $10^{-7}$, so this tolerance would not actually be sufficiently granular to collect all the results). Plugging this same tolerance value into the new model predicts that a complete explication of 4-Card Rummy with Aces Low would require $255 * 0.0000277^{-0.710} \approx 440000$ seconds $\approx 121$ hours. While this would not be impossible to achieve, it is certainly inconvenient and an order of magnitude longer than any other calculation performed for this project. Since the edge gained by a refinement of 0.001 turns is unlikely to change the outcome of a game, we can confidently call the Hand - E dictionary formed by the output of this approximation a satisficing solution for 4-Card Rummy with aces low. 
+
+\begin{figure}
+\includegraphics[width=\textwidth]{fig10.png}
+\caption{Estimated E for 4-Card Rummy with Tolerance = 0.001}\label{fig:10}
+\end{figure}
+
+
 
 % ------------------------------------------------------------------------------
 % End document

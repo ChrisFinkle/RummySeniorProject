@@ -1,0 +1,181 @@
+---
+title: "Senior Research"
+author: "Chris Finkle"
+date: "April 15, 2017"
+output: html_document
+---
+
+```{r}
+suppressMessages(library(dplyr))
+suppressMessages(library(ggplot2))
+
+actual <- read.csv("3aceLowResultsFull.txt",strip.white = T, header=F)
+colnames(actual) <- c("Hand", "E")
+approx1 <- read.csv("3lowApprox1full.txt",strip.white = T)
+
+comp <- merge(actual,approx1, by.x="Hand", by.y="Hand")
+colnames(comp)<-c("Hand","Actual", "Approx1")
+
+comp <- comp %>%
+  mutate(diff = Approx1 - Actual) %>%
+  arrange(Actual)
+
+summary(comp)
+
+ggplot(comp, aes(x=1:22100, y=diff)) + geom_point()
+
+pl1 <- comp %>%
+  filter(Actual>0) %>%
+  ggplot(aes(x=97:22100, y=Approx1)) + 
+  geom_point(size=0.01, alpha=0.5) +
+  geom_line(aes(x=97:22100, y=Actual), color="blue")+
+  scale_x_continuous("Cumulative Hands Evaluated") +
+  scale_y_continuous("Expected Turns to Rummy") +
+  ggtitle("Approximation with Tolerance 1 vs Actual Values")+
+  theme(panel.background = element_blank(),
+        panel.border = element_rect(color="black",fill=NA,size=1),
+        plot.title = element_text(hjust=.5))
+
+pl1
+
+ggsave("../../images/fig4.png", pl1, width = 8, height = 6)
+```
+
+```{r}
+actual <- read.csv("3aceLowResultsFull.txt",strip.white = T, header=F)
+colnames(actual) <- c("Hand", "E")
+
+approx2 <- read.csv("3lowApprox2full.txt",strip.white = T, header=F)
+
+comp <- merge(actual,approx2, by.x="Hand", by.y="V1")
+colnames(comp)<-c("Hand","Actual", "Approx2")
+
+comp <- comp %>%
+  mutate(diff = Approx2 - Actual) %>%
+  arrange(Actual)
+
+
+fig5<-ggplot(comp, aes(x=1:22100, y=diff)) + 
+  geom_point(size=0.8) +
+  scale_x_continuous("Cumulative Hands Evaluated") +
+  scale_y_continuous("Error") +
+  ggtitle("Errors for Tolerance of 0.5") +
+  theme(panel.background = element_blank(),
+        panel.border = element_rect(color="black",fill=NA,size=1),
+        plot.title = element_text(hjust=.5))
+
+ggsave("../../images/fig5.png", fig5, width = 8, height = 5)
+```
+
+```{r}
+actual <- read.csv("3aceLowResultsFull.txt",strip.white = T, header=F)
+colnames(actual) <- c("Hand", "E")
+approx3 <- read.csv("3lowApprox3full.txt",strip.white = T, header=F)
+approx5 <- read.csv("3lowApprox5full.txt",strip.white = T, header=F)
+approx10 <-read.csv("3lowApprox10full.txt",strip.white = T, header=F)
+comp <- merge(actual,approx3, by.x="Hand", by.y="V1")
+comp <- merge(comp,approx5, by.x="Hand", by.y="V1")
+comp <- merge(comp,approx10, by.x="Hand", by.y="V1")
+colnames(comp)<-c("Hand","Actual", "Approx3","Approx5","Approx10")
+
+comp <- comp %>%
+  mutate(diff3 = Approx3 - Actual) %>%
+  mutate(diff5 = Approx5 - Actual) %>%
+  mutate(diff10 = Approx10 - Actual) %>%
+  arrange(Actual)
+
+summary(comp)
+
+fig6 <- ggplot(comp, aes(x=1:22100, y=diff3)) + geom_point(color="blue",size=0.7, alpha=0.5) +
+  geom_point(aes(x=1:22100,y=diff5), color="green", size=0.7, alpha=0.5) +
+  geom_point(aes(x=1:22100,y=diff10), color="red",size=0.7, alpha=0.5) +
+  scale_x_continuous("Cumulative Hands Evaluated") +
+  scale_y_continuous("Error") +
+  ggtitle("Errors for Tolerance of 0.33, 0.2, and 0.1") +
+  theme(panel.background = element_blank(),
+        panel.border = element_rect(color="black",fill=NA,size=1),
+        plot.title = element_text(hjust=.5))
+
+ggsave("../../images/fig6.png", fig6, width = 8, height = 5)
+```
+```{r}
+times <- read.csv("times.txt")
+head(times)
+fig7 <- ggplot(times,aes(x=Tolerance, y=Time)) + 
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10("Time (s)") +
+  geom_smooth(method = "lm", se=F) +
+  ggtitle("Times Required to Run Approximation (log scales)") +
+  theme(panel.background = element_blank(),
+        panel.border = element_rect(color="black",fill=NA,size=1),
+        plot.title = element_text(hjust=.5))
+
+model <- lm(log(Time)~log(Tolerance), data = times)
+
+ggsave("../../images/fig7.png", fig7, width = 8, height = 5)
+
+summary(model)
+```
+
+
+```{r}
+library(scales)
+a.4.1 <- read.csv("../../4card/approximate/4lowApprox1full.txt",strip.white = T)
+fig8 <- a.4.1 %>%
+  filter(E>0) %>%
+  ggplot(aes(x=54:270725, y=E)) + geom_point(size = 0.01, alpha = 0.5) +
+  scale_y_continuous("Expected Turns to Rummy") +
+  scale_x_continuous("Cumulative Hands Evaluated", labels=comma) +
+  ggtitle("Estimated E for 4-Card Rummy with Tolerance 1") +
+  theme(panel.background = element_blank(),
+        panel.border = element_rect(color="black",fill=NA,size=1),
+        plot.title = element_text(hjust=.5))
+
+ggsave("../../images/fig8.png", fig8, width = 8, height = 6)
+
+
+a.4.2 <- cbind(read.csv("../../4card/approximate/4lowApprox2full.txt",strip.white = T),tol = c("0.5")) %>% filter(E>0)# %>% arrange(E)
+a.4.5 <- cbind(read.csv("../../4card/approximate/4lowApprox5full.txt",strip.white = T),tol = c("0.2")) %>% filter(E>0)#%>% arrange(E)
+a.4.20 <- cbind(read.csv("../../4card/approximate/4lowApprox20full.txt",strip.white = T),tol = c("0.05")) %>% filter(E>0)#%>% arrange(E)
+
+a.4.2$Hand <- 54:270725
+a.4.5$Hand <- 54:270725
+a.4.20$Hand <- 54:270725
+
+data4 <- rbind(a.4.2,a.4.5)
+data4 <- rbind(data4, a.4.20)
+
+fig9 <- ggplot(data4, aes(x = Hand, y = E, color = tol)) + 
+  geom_point(size = 0.01, alpha = 0.5) +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  scale_y_continuous("Expected Turns to Rummy") +
+  scale_x_continuous("Cumulative Hands Evaluated", labels=comma) +
+  scale_color_manual("Tolerance", values = c("blue","green","red"))+
+  theme(panel.background = element_blank(),
+        panel.border = element_rect(color="black",fill=NA,size=1),
+        plot.title = element_text(hjust=.5))
+fig9
+ggsave("../../images/fig9.png", fig9, width = 8, height = 6)
+```
+
+
+```{r}
+a.4.1000 <- read.csv("../../4card/approximate/4lowApprox1000full.txt",strip.white = T)
+a.4.1000 <- a.4.1000 %>% filter(E>0) %>% arrange(E)
+fig10 <- ggplot(a.4.1000, aes(x=54:270725, y=E)) +
+  geom_point(size = 0.01, color = "black") +
+  scale_y_continuous("Expected Turns to Rummy") +
+  scale_x_continuous("Cumulative Hands Evaluated", labels=comma) +
+  theme(panel.background = element_blank(),
+        panel.border = element_rect(color="black",fill=NA,size=1),
+        plot.title = element_text(hjust=.5))
+
+ggsave("../../images/fig10.png", fig10, width = 8, height = 5)
+```
+
+```{r}
+sumlow <- read.csv("../deterministic/3aceLowResults.txt", sep=" ", header=F)
+sumlow <- sumlow %>% select(V10)
+min(diff(sumlow$V10))
+```
