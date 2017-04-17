@@ -1,3 +1,4 @@
+53 hands like AC AD AH AS with E = 0.0000000000
 1724 hands like AC 2D 3D 4D with E = 24.0000000000
 20 hands like 3C 4C 6C 7C with E = 28.8000000000
 80 hands like AC 4C 6C 7C with E = 30.0000000000

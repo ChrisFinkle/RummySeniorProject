@@ -1,0 +1,6 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Introduction}{2}
+\contentsline {section}{\numberline {1.1}Background and Objective}{2}
+\contentsline {section}{\numberline {1.2}Games of the Rummy Family}{2}
+\contentsline {subsection}{\numberline {1.2.1}Mathematics}{3}
+\contentsline {subsection}{\numberline {1.2.2}Lists}{3}
