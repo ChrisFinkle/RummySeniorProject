@@ -34,6 +34,7 @@ int main ( int argc, char *argv[] )
 	else {
 		ofstream times;
 		times.open("times.txt");
+		times << "Tolerance,Time" << endl;
 		Hand **hands = new Hand*[22100];
 		map<set<int>, int> idxs;
 		int counter = 0;
@@ -105,11 +106,11 @@ int main ( int argc, char *argv[] )
 							hands[i]->lockIn();
 							locked++;
 							if(!xf){
-								outfull << hands[i]->prettyPrintHand() << fixed << setprecision(9) << minE << endl;
+								outfull << hands[i]->prettyPrintHand() << "," << fixed << setprecision(9) << hands[i]->getE() << endl;
 								xhand = hands[i]->prettyPrintHand();
 								xf = true;
 							} else {
-								outfull << hands[i]->prettyPrintHand() << fixed << setprecision(4) << minE << endl;
+								outfull << hands[i]->prettyPrintHand() << "," << fixed << setprecision(4) << hands[i]->getE() << endl;
 							}
 						}
 					}
@@ -122,10 +123,7 @@ int main ( int argc, char *argv[] )
 				time_t end;
 				time(&end);
 				int duration = difftime(start, end);
-				times << "For tolerance " << tol << " (presumed mean accuracy " <<
-				  tol*0.3 << ") " << counter << " groups calculated in " << duration
-				  << " seconds" << endl;
-
+				times << tol << "," << duration << endl; 
 				for(int i=0; i<22100; i++){
 					if(hands[i]->getLockedIn()){
 						hands[i]->reset();
