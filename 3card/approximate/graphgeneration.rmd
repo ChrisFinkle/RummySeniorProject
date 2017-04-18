@@ -31,14 +31,12 @@ pl1 <- comp %>%
   geom_line(aes(x=97:22100, y=Actual), color="blue")+
   scale_x_continuous("Cumulative Hands Evaluated") +
   scale_y_continuous("Expected Turns to Rummy") +
-  ggtitle("Approximation with Tolerance 1 vs Actual Values")+
   theme(panel.background = element_blank(),
-        panel.border = element_rect(color="black",fill=NA,size=1),
-        plot.title = element_text(hjust=.5))
+        panel.border = element_rect(color="black",fill=NA,size=1))
 
 pl1
 
-ggsave("../../images/fig4.png", pl1, width = 8, height = 6)
+ggsave("../../images/fig4.png", pl1, width = 8, height = 5)
 ```
 
 ```{r}
@@ -59,10 +57,8 @@ fig5<-ggplot(comp, aes(x=1:22100, y=diff)) +
   geom_point(size=0.8) +
   scale_x_continuous("Cumulative Hands Evaluated") +
   scale_y_continuous("Error") +
-  ggtitle("Errors for Tolerance of 0.5") +
   theme(panel.background = element_blank(),
-        panel.border = element_rect(color="black",fill=NA,size=1),
-        plot.title = element_text(hjust=.5))
+        panel.border = element_rect(color="black",fill=NA,size=1))
 
 ggsave("../../images/fig5.png", fig5, width = 8, height = 5)
 ```
@@ -91,10 +87,8 @@ fig6 <- ggplot(comp, aes(x=1:22100, y=diff3)) + geom_point(color="blue",size=0.7
   geom_point(aes(x=1:22100,y=diff10), color="red",size=0.7, alpha=0.5) +
   scale_x_continuous("Cumulative Hands Evaluated") +
   scale_y_continuous("Error") +
-  ggtitle("Errors for Tolerance of 0.33, 0.2, and 0.1") +
   theme(panel.background = element_blank(),
-        panel.border = element_rect(color="black",fill=NA,size=1),
-        plot.title = element_text(hjust=.5))
+        panel.border = element_rect(color="black",fill=NA,size=1))
 
 ggsave("../../images/fig6.png", fig6, width = 8, height = 5)
 ```
@@ -106,10 +100,8 @@ fig7 <- ggplot(times,aes(x=Tolerance, y=Time)) +
   scale_x_log10() +
   scale_y_log10("Time (s)") +
   geom_smooth(method = "lm", se=F) +
-  ggtitle("Times Required to Run Approximation (log scales)") +
   theme(panel.background = element_blank(),
-        panel.border = element_rect(color="black",fill=NA,size=1),
-        plot.title = element_text(hjust=.5))
+        panel.border = element_rect(color="black",fill=NA,size=1))
 
 model <- lm(log(Time)~log(Tolerance), data = times)
 
@@ -127,12 +119,10 @@ fig8 <- a.4.1 %>%
   ggplot(aes(x=54:270725, y=E)) + geom_point(size = 0.01, alpha = 0.5) +
   scale_y_continuous("Expected Turns to Rummy") +
   scale_x_continuous("Cumulative Hands Evaluated", labels=comma) +
-  ggtitle("Estimated E for 4-Card Rummy with Tolerance 1") +
   theme(panel.background = element_blank(),
-        panel.border = element_rect(color="black",fill=NA,size=1),
-        plot.title = element_text(hjust=.5))
+        panel.border = element_rect(color="black",fill=NA,size=1))
 
-ggsave("../../images/fig8.png", fig8, width = 8, height = 6)
+ggsave("../../images/fig8.png", fig8, width = 8, height = 5)
 
 
 a.4.2 <- cbind(read.csv("../../4card/approximate/4lowApprox2full.txt",strip.white = T),tol = c("0.5")) %>% filter(E>0)# %>% arrange(E)
@@ -156,7 +146,7 @@ fig9 <- ggplot(data4, aes(x = Hand, y = E, color = tol)) +
         panel.border = element_rect(color="black",fill=NA,size=1),
         plot.title = element_text(hjust=.5))
 fig9
-ggsave("../../images/fig9.png", fig9, width = 8, height = 6)
+ggsave("../../images/fig9.png", fig9, width = 8, height = 5)
 ```
 
 
