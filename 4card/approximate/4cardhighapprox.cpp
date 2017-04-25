@@ -1,0 +1,142 @@
+#include "hand.h"
+#include <iostream>
+#include <iomanip>
+#include <set>
+#include <map>
+#include <fstream>
+#include <stdlib.h>
+#include <errno.h>
+#include <time.h>
+using namespace std;
+
+bool isRummyAceHigh(set<int> _cards){
+	int i = 0;
+	int c[4];
+	for(set<int>::iterator it = _cards.begin(); it!=_cards.end(); ++it){
+		c[i++]=*it;
+	}
+	if(c[0]%4==c[1]%4 && c[1]%4==c[2]%4 && c[2]%4==c[3]%4){
+		if(c[3]/4-c[2]/4==1 && c[2]/4-c[1]/4==1 && c[1]/4-c[0]/4==1){
+			return true;
+		}
+		else if (c[0]/4==0 && c[1]/4==10)
+		{
+			return true;
+		}
+	}
+	if(c[0]/4==c[1]/4 && c[1]/4==c[2]/4 && c[2]/4==c[3]/4){
+		return true;
+	}
+	return false;
+}
+
+int main( int argc, char *argv[] ){
+	if ( argc < 2 ) // argc should be 2 for correct execution
+		cout<<"usage: "<< argv[0] <<" number of buckets per unit (int)" << endl;
+	else {
+		
+		Hand **hands = new Hand*[270725];
+		map<set<int>, int> idxs;
+		int counter = 0;
+		for(int h=0; h<49; h++){
+			for(int i=h+1; i<50; i++){
+				for(int j=i+1; j<51; j++){
+					for(int k=j+1; k<52; k++){
+						set<int> c;
+						c.insert(h);
+						c.insert(i);
+						c.insert(j);
+						c.insert(k);
+						idxs[c] = counter;
+						hands[counter++] = new Hand(c, 4, hands, &idxs, isRummyAceHigh);
+					}
+				}
+			}
+		}
+		int locked = 0;
+		for(int i=0; i<270725; i++){
+			if(hands[i]->getLockedIn()){
+				locked++;
+			}
+		}
+
+		cout << "Rummies: " << locked << endl;
+		for(int i=0; i<270725; i++){
+			hands[i]->assocHands();
+			if(i%5000==0){
+				cout << "Associated " << i << " out of 270725 hands" << endl;
+			}
+		}
+
+		for(int i=1; i<argc; i++){
+			char* p;
+			errno = 0;
+			int arg = strtol(argv[i], &p, 10);
+			if (*p != '\0' || errno != 0) {
+				cout << "Discarding argument " << argv[i] << " (could not convert to int)" << endl;
+			} else {
+				time_t start;
+				time(&start);
+				int counter = 0;
+
+				double tol = 1.0/arg;
+				string sarg(argv[i]);
+				string sumOutStr = "4highApprox" + sarg + ".txt";
+				string fullOutStr = "4Approx" + sarg + "full.txt";
+				
+				ofstream outfull;
+				outfull.open(fullOutStr);
+				outfull << "Hand,E" << endl;
+				ofstream outsum;
+				outsum.open(sumOutStr);
+
+				int locked = 0;
+				for(int i=0; i<270725; i++){
+					if(hands[i]->getLockedIn()){
+						outfull << hands[i]->prettyPrintHand() << 0 << endl;
+						locked++;
+					}
+				}
+
+				while(locked<270725){
+					bool xf = false;
+					string xhand = "";
+					int oldlocked = locked;
+					double minE = 50.0;
+					for(int i=0; i<270725; i++){
+						if(!hands[i]->getLockedIn()){
+							if(hands[i]->evalE()<minE){
+								minE = hands[i]->getE();
+							}
+						}
+					}
+
+					for(int i=0; i<270725; i++){
+						if(hands[i]->getE()-minE < tol && !hands[i]->getLockedIn()){
+							hands[i]->lockIn();
+							locked++;
+							if(!xf){
+								outfull << hands[i]->prettyPrintHand() << fixed << setprecision(9) << hands[i]->getE() << endl;
+								xhand = hands[i]->prettyPrintHand();
+								xf = true;
+							} else {
+								outfull << hands[i]->prettyPrintHand() << fixed << setprecision(9) << hands[i]->getE() << endl;
+							}
+						}
+					}
+					cout << locked - oldlocked << " hands like " << xhand << "with E = " << minE << endl;
+					outsum << locked - oldlocked << " hands like " << xhand << "with E = " << fixed << setprecision(10) << minE << endl;
+					counter++;
+				}
+				outsum.close();
+				outfull.close();
+
+				for(int i=0; i<270725; i++){
+					if(hands[i]->getLockedIn()){
+						hands[i]->reset();
+					}
+				}
+			}
+		}
+	}
+}
